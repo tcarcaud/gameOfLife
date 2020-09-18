@@ -1,0 +1,8 @@
+--render
+ascii
+--height
+5
+--width
+5
+--generation
+3
