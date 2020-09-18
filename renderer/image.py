@@ -1,16 +1,20 @@
 import logging
 from PIL import Image, ImageDraw, ImageFont
+from renderer.base import RendererBase
 logger = logging.getLogger(__name__)
 
 GRID_SIZE = 10
 
 
-class GifRenderer:
+class GifRenderer(RendererBase):
     def __init__(self, board):
         self.frames = list()
         self.current_frame = None
         self.height = board.max_row + 1
         self.width = board.max_column
+
+    def configure_logging(self, logger_):
+        logging.basicConfig()
 
     def draw_board_row(self, board, r):
         for c in range(board.max_column):
@@ -30,6 +34,9 @@ class GifRenderer:
             else:
                 self.draw_board_row(board, r-1)
         self.frames.append(image)
+
+    def finish(self):
+        self.save_as_image('glider.gif')
 
     def save_as_image(self, filename):
         logging.info("Saving %d frames to %s" % (len(self.frames), filename))

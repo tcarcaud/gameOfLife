@@ -1,5 +1,7 @@
 import logging
 import curses
+import time
+from renderer.base import RendererBase
 logger = logging.getLogger(__name__)
 
 
@@ -25,7 +27,7 @@ class CursesHandler(logging.Handler):
             self.handleError(record)
 
 
-class CursesRenderer:
+class CursesRenderer(RendererBase):
     def __init__(self, board):
         self.height = board.max_row+2
         self.width = board.max_column+2
@@ -64,7 +66,7 @@ class CursesRenderer:
             else:
                 self.win.addch("X" if board.get(row-1, c-1) else " ")
 
-    def draw(self, board):
+    def draw(self, board, generation):
         self.win.clear()
         try:
             for r in range(self.height):
@@ -74,6 +76,9 @@ class CursesRenderer:
                 else:
                     self.draw_board_row(board, r)
             self.win.noutrefresh()
+            self.set_status("Generation %d" % (generation+1))
+            self.update_screen()
+            time.sleep(0.2)
         except Exception as err:
             logger.exception(err)
 

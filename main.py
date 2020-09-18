@@ -1,10 +1,8 @@
-import time
 import random
 import logging
 from board import BoardPair, set_glider, set_random
 from controller import next_board
-from renderer.console import CursesRenderer
-from renderer.image import GifRenderer
+from renderer import create_renderer
 logger = logging.getLogger()
 
 
@@ -23,34 +21,17 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     board = BoardPair(args.height, args.width)
-    if args.render == 'ascii':
-        pass
-    elif args.render == 'console':
-        renderer = CursesRenderer(board)
-        renderer.configure_logging(logger)
-    elif args.render == 'image':
-        renderer = GifRenderer(board)
-        logging.basicConfig()
-
+    renderer = create_renderer(args.render, board)
+    renderer.configure_logging(logger)
     logger.setLevel(level=logging.INFO)
 
 #    set_glider(0, 0, board)
 #    random.seed(42)
     set_random(board)
     for generation in range(args.generation):
-        if args.render == 'ascii':
-            print(board.get_active_board())
-        elif args.render == 'console':
-            renderer.draw(board)
-            renderer.set_status("Generation %d" % (generation+1))
-            renderer.update_screen()
-            time.sleep(0.2)
-        elif args.render == 'image':
-            renderer.draw(board, generation)
-
+        renderer.draw(board, generation)
         next_board(board.get_active_board(), board.get_next_board())
         board.flip()
 
-    if args.render == 'image':
-        renderer.save_as_image('glider.gif')
+    renderer.finish()
 
